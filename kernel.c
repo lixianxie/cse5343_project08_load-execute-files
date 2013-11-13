@@ -1,5 +1,5 @@
 //lixian xie
-//write some simple system calls.
+//loading and executing files for project08.
 
 int myMod(int a, int b);
 int myDiv(int a, int b);
@@ -9,18 +9,10 @@ void readSector(char* buffer, int sector);
 void handleInterrupt21(int ax, int bx, int cx, int dx);
 
 int main(){
-	char line[80];
-	char buffer[512];
-	printString("Enter a line: ");//this part is for step1
-	readString(line);  //this part is for step2
- 	printString(line);	
- 	readSector(buffer,30); //this part is for step3
- 	printString(buffer);
- 	makeInterrupt21();   //this part is for step4
- 	//interrupt(0x21,0,0,0,0);
- 	interrupt(0x21,1,line,0,0);//this part is for step5
- 	interrupt(0x21,0,line,0,0);
-	//interrupt(0x21,3,line,0,0);
+	char buffer[13312];
+ 	makeInterrupt21();   
+ 	interrupt(0x21,3,"messag",buffer,0);//read file into buffer
+ 	interrupt(0x21,0,buffer,0,0); //print out the file
 	while(1){
 		//todo
 	}
@@ -75,6 +67,25 @@ void readSector(char* buffer, int sector){
 	interrupt(0x13,2*256+1,buffer,track*256+relativeSector,head*256);
 }
 
+void readFile(char* fileName, char* buffer){
+	int i,j,k;
+	char temp[512];
+	readSector(temp,2);//load dir sector to temp	
+	for(i=0;i<16;i++){  //maximum 16 file entries in dir sector
+		for(j=0;j<6;j++){
+			if(temp[j+32*i]!=fileName[j])break;
+		}
+		if(j==6)break;
+	}
+	if(j==6){
+		while(j<32){
+			if(temp[j+32*i]!=0x00)readSector(buffer+512*(j-6),temp[j+32*i]);
+			j++;
+		}
+	}
+	if(i==16)printString("File not found!\r\n");
+}
+
 void handleInterrupt21(int ax, int bx, int cx, int dx){
 	//printString("hello world\r\n"); //testing in step4
 	if(ax==0){
@@ -83,6 +94,8 @@ void handleInterrupt21(int ax, int bx, int cx, int dx){
 		readString(bx);
 	}else if(ax==2){
 		readSector(bx,cx);
+	}else if(ax==3){
+		readFile(bx,cx);
 	}else{
 		printString("error:invalid int!\r\n");
 	}
