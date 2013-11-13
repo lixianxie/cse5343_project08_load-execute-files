@@ -6,6 +6,9 @@ int myDiv(int a, int b);
 void printString(char* str);
 void readString(char* str);
 void readSector(char* buffer, int sector);
+void readFile(char* fileName, char* buffer);
+void executeProgram(char* name, int segment);
+void terminate();
 void handleInterrupt21(int ax, int bx, int cx, int dx);
 
 int main(){
@@ -13,6 +16,7 @@ int main(){
  	makeInterrupt21();   
  	interrupt(0x21,3,"messag",buffer,0);//read file into buffer
  	interrupt(0x21,0,buffer,0,0); //print out the file
+ 	interrupt(0x21,4,"tstprg",0x2000,0);//load program tstprg and execute it
 	while(1){
 		//todo
 	}
@@ -77,13 +81,28 @@ void readFile(char* fileName, char* buffer){
 		}
 		if(j==6)break;
 	}
-	if(j==6){
-		while(j<32){
+	if(j==6){  //means found matched fileName
+		while(j<32){  //load sector by sector
 			if(temp[j+32*i]!=0x00)readSector(buffer+512*(j-6),temp[j+32*i]);
 			j++;
 		}
 	}
 	if(i==16)printString("File not found!\r\n");
+}
+
+void executeProgram(char* name, int segment){
+	char temp[13312];
+	int i;
+	readFile(name,temp); //load program to temp
+	for(i=0;i<13312;i++){  //put temp into memory
+		putInMemory(segment,i,temp[i]);
+	}
+	printString("launching program...\r\n");
+	launchProgram(segment);
+}
+
+void terminate(){
+	
 }
 
 void handleInterrupt21(int ax, int bx, int cx, int dx){
@@ -96,8 +115,38 @@ void handleInterrupt21(int ax, int bx, int cx, int dx){
 		readSector(bx,cx);
 	}else if(ax==3){
 		readFile(bx,cx);
+	}else if(ax==4){		
+		executeProgram(bx,cx);
+	}else if(ax==5){
+		terminate();
 	}else{
 		printString("error:invalid int!\r\n");
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

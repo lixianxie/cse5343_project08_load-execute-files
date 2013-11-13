@@ -5,4 +5,5 @@ dd if=kernel of=floppya.img bs=512 conv=notrunc seek=3
 dd if=map.img of=floppya.img bs=512 count=1 seek=1 conv=notrunc
 dd if=dir.img of=floppya.img bs=512 count=1 seek=2 conv=notrunc
 ./loadFile message.txt
+./loadFile tstprg
 bochs -f opsys.bxrc
