@@ -6,7 +6,7 @@ int myDiv(int a, int b);
 void printString(char* str);
 void readString(char* str);
 void readSector(char* buffer, int sector);
-void readFile(char* fileName, char* buffer);
+int readFile(char* fileName, char* buffer);
 void executeProgram(char* name, int segment);
 void terminate();
 void handleInterrupt21(int ax, int bx, int cx, int dx);
@@ -17,6 +17,7 @@ int main(){
  	interrupt(0x21,3,"messag",buffer,0);//read file into buffer
  	interrupt(0x21,0,buffer,0,0); //print out the file
  	interrupt(0x21,4,"tstprg",0x2000,0);//load program tstprg and execute it
+ 	interrupt(0x21,5,"tstpr2",0x2000,0);
 	while(1){
 		//todo
 	}
@@ -71,7 +72,7 @@ void readSector(char* buffer, int sector){
 	interrupt(0x13,2*256+1,buffer,track*256+relativeSector,head*256);
 }
 
-void readFile(char* fileName, char* buffer){
+int readFile(char* fileName, char* buffer){
 	int i,j,k;
 	char temp[512];
 	readSector(temp,2);//load dir sector to temp	
@@ -87,26 +88,32 @@ void readFile(char* fileName, char* buffer){
 			j++;
 		}
 	}
-	if(i==16)printString("File not found!\r\n");
+	if(i==16){
+		printString("File not found!\r\n");
+		return 0;
+	}else return 1;
 }
 
 void executeProgram(char* name, int segment){
 	char temp[13312];
 	int i;
-	readFile(name,temp); //load program to temp
-	for(i=0;i<13312;i++){  //put temp into memory
-		putInMemory(segment,i,temp[i]);
-	}
-	printString("launching program...\r\n");
-	launchProgram(segment);
+	//readFile(name,temp); //load program to temp
+	if(readFile(name,temp)==1){//means that the program file exists
+		for(i=0;i<13312;i++){  //put temp into memory
+			putInMemory(segment,i,temp[i]);
+		}
+		printString("launching program...\r\n");
+		launchProgram(segment);
+	}	
 }
 
 void terminate(){
-	
+	while(1){
+		
+	}
 }
 
 void handleInterrupt21(int ax, int bx, int cx, int dx){
-	//printString("hello world\r\n"); //testing in step4
 	if(ax==0){
 		printString(bx);
 	}else if(ax==1){
