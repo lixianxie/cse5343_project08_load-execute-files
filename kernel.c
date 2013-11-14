@@ -16,8 +16,9 @@ int main(){
  	makeInterrupt21();   
  	interrupt(0x21,3,"messag",buffer,0);//read file into buffer
  	interrupt(0x21,0,buffer,0,0); //print out the file
- 	interrupt(0x21,4,"tstprg",0x2000,0);//load program tstprg and execute it
- 	interrupt(0x21,5,"tstpr2",0x2000,0);
+ 	//interrupt(0x21,4,"tstprg",0x2000,0);//load program tstprg and execute it
+ 	//interrupt(0x21,5,"tstpr2",0x2000,0);
+ 	interrupt(0x21,4,"shell",0x2000,0);
 	while(1){
 		//todo
 	}
@@ -108,9 +109,7 @@ void executeProgram(char* name, int segment){
 }
 
 void terminate(){
-	while(1){
-		
-	}
+		interrupt(0x21,4,"shell",0x2000,0);
 }
 
 void handleInterrupt21(int ax, int bx, int cx, int dx){

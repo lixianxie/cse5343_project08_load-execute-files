@@ -9,7 +9,7 @@ int main(){
 	while(1){
 		printString("shell> ");
 		readString(cmdLine);
-
+		printString("shell> Bad command!\r\n");
 	}
 	return 0;
 }
