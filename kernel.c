@@ -18,7 +18,7 @@ int main(){
  	interrupt(0x21,0,buffer,0,0); //print out the file
  	//interrupt(0x21,4,"tstprg",0x2000,0);//load program tstprg and execute it
  	//interrupt(0x21,5,"tstpr2",0x2000,0);
- 	interrupt(0x21,4,"shell",0x2000,0);
+ 	interrupt(0x21,4,"shell",0x2000,0);//load and execute shell
 	while(1){
 		//todo
 	}
@@ -98,7 +98,6 @@ int readFile(char* fileName, char* buffer){
 void executeProgram(char* name, int segment){
 	char temp[13312];
 	int i;
-	//readFile(name,temp); //load program to temp
 	if(readFile(name,temp)==1){//means that the program file exists
 		for(i=0;i<13312;i++){  //put temp into memory
 			putInMemory(segment,i,temp[i]);
