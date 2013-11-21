@@ -10,6 +10,7 @@
 	.extern _handleInterrupt21
 	.global _printhex
 
+
 ;void putInMemory (int segment, int address, char character)
 _putInMemory:
 	push bp
@@ -98,7 +99,10 @@ _launchProgram:
 	mov sp,#0xfff0	;set up the stack pointer
 	mov bp,#0xfff0
 
+
 jump:	jmp #0x0000:0x0000	;and start running (the first 0000 is changed above)
+
+
 
 ;printhex is used for debugging only
 ;it prints out the contents of ax in hexadecimal
