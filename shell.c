@@ -1,6 +1,8 @@
 //lixianxie
 //make shell for project08
 
+void cleanString(char* str);
+
 int main(){
 	int i;
 	char cmd[128];
@@ -16,7 +18,6 @@ int main(){
 			//interrupt(0x21,0,"shell> ",0,0);
 			interrupt(0x21,3,tst,buf,0);//read file tst to buf
 			interrupt(0x21,0,buf,0,0);//print out buf
-			//interrupt(0x21,5,0,0,0);//invoke terminate(),that is shell again
 		}else if(cmd[0]=='e'&&cmd[1]=='x'&&cmd[2]=='e'&&cmd[3]=='c'&&cmd[4]=='u'&&cmd[5]=='t'&&cmd[6]=='e'&&cmd[7]==' '){
 			for(i=8;cmd[i]!=0;i++){
 					tst[i-8]=cmd[i];
@@ -26,10 +27,17 @@ int main(){
 		}else{
 			//interrupt(0x21,0,"shell> ",0,0);
 			interrupt(0x21,0,"Bad command!\r\n",0,0);
-		}		
+		}	
+		cleanString(cmd);	
 	}
 	return 0;
 }
+
+void cleanString(char* str){
+	int i;
+	for(i=0;str[i]!=0;i++)str[i]='\0';
+}
+
 //the shell command here is not as robust as we built in project05,
 //we just learn how to invoke interrupt0x21, so no need to write it too complicated here.
 //you can see my shell.c in project05 if you like robust shell.
